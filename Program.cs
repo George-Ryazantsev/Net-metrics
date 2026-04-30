@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.WebHost.UseUrls("http://0.0.0.0:5000");
+//builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 builder.Services.AddScoped<IMetricsService, MetricsService>();
 
@@ -24,7 +24,7 @@ if (app.Environment.IsDevelopment())
    // app.MapOpenApi();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
@@ -32,13 +32,13 @@ app.MapControllers();
 
 app.Lifetime.ApplicationStarted.Register(() =>
 {
-    Console.WriteLine("Application started1!!");
+    Console.WriteLine("Application started!!!");
 });
 
-app.MapGet("/", context =>
+/*app.MapGet("/", context =>
 {
     context.Response.Redirect("/swagger");
     return Task.CompletedTask;
-});
+});*/
 
 app.Run();
