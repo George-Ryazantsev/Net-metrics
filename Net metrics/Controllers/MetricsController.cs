@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿//Ignore Spelling: dto
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Net_metrics.DTO;
 using Net_metrics.Services;
 
@@ -6,15 +9,11 @@ namespace Net_metrics.Controllers
 {
     [ApiController]
     [Route("api/metrics")]
-    public class MetricsController : ControllerBase
+    public class MetricsController(IMetricsService service) : ControllerBase
     {
-        private readonly IMetricsService _metricsService;
+        private readonly IMetricsService _metricsService = service;
 
-        public MetricsController(IMetricsService service)
-        {
-            _metricsService = service;
-        }
-
+        [Authorize]
         [HttpPost("transferBase")]
         public async Task<IActionResult> Post([FromBody] MetricDto dto)
         {

@@ -1,17 +1,39 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Net_metrics.Services;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string filePath = "C:\\Users\\g.ryazancev\\Desktop\\Metrics\\metrics.txt";
-//string filePath = "/home/dev1/metrics/Output/metrics.txt";
+//string filePath = "C:\\Users\\g.ryazancev\\Desktop\\Metrics\\metrics.txt";
+string filePath = "/home/dev1/metrics/Output/metrics.txt";
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.WebHost.UseUrls("http://0.0.0.0:5000");
-
 builder.Services.AddScoped<IMetricsService, MetricsService>();
+
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
+
+string secret = builder.Configuration.GetSection("Secret").Value!;
+var key = Encoding.UTF8.GetBytes(secret);
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -23,15 +45,12 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-//builder.Services.AddOpenApi();
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    // app.MapOpenApi();
 }
 
 //app.UseHttpsRedirection();
